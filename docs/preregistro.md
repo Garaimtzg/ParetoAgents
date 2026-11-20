@@ -1,6 +1,6 @@
 # ParetoAgents — Preregistro de hipótesis y análisis
 
-**Versión:** 1.0 (borrador de la Fase 0) · **Fecha:** 2026-11-20 · **Estado:** pendiente de firma
+**Versión:** 1.0 · **Fecha:** 2026-11-20 · **Estado:** congelado (`prereg-v1`)
 
 Este documento congela, **antes de ver ningún resultado**, qué se va a medir, cómo y con qué criterios se aceptan o rechazan las hipótesis. Complementa a [`definicion_proyecto.md`](definicion_proyecto.md). Los valores numéricos viven en [`config/experiment.yaml`](../config/experiment.yaml) y [`config/variants.yaml`](../config/variants.yaml); si este texto y la configuración no coinciden, manda la configuración y se corrige el texto.
 

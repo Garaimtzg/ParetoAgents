@@ -10,7 +10,7 @@ Si en vez de usar siempre Opus repartimos el trabajo entre Sonnet y Haiku, ¿cu�
 
 | Fase | Estado | Puerta |
 | --- | --- | --- |
-| 0 — Definición y preregistro | **Lista para firmar** (decisiones en `propuesta`) | No quedan decisiones abiertas |
+| 0 — Definición y preregistro | **Cerrada** (etiqueta `prereg-v1`) | No quedan decisiones abiertas |
 | 1 — Scaffold e infraestructura | Pendiente | Una tarea de extremo a extremo en B1-SDK y B1-CC, con filas en SQLite |
 | 2 — Calibración de telemetría | Pendiente | Error < 1 % frente a la factura; 100 % de los mensajes atribuidos |
 | 3 — Dataset | Pendiente | 25/25/25 con criterio reproducible |
