@@ -1,0 +1,79 @@
+# 6 topologías → 10 variantes (D-013): B1 y B2 son una sola variante ("solo");
+# A1–A4 existen en los dos tracks (SDK y CC). Ver docs/decisiones.md.
+# Cambiar algo aquí después del preregistro exige una entrada nueva en docs/decisiones.md.
+#
+# effort: low | medium | high | xhigh | max (output_config.effort en la API).
+# Ojo: Opus 5.5 y Haiku 5.5 tienen "medium" por defecto y Sonnet 5.5 "high";
+# por eso el esfuerzo se fija SIEMPRE de forma explícita.
+
+models:
+  opus: claude-opus-5-5
+  sonnet: claude-sonnet-5-5
+  haiku: claude-haiku-5-5
+
+tracks: [sdk, cc]
+
+topologies:
+  B1:
+    name: Referencia cara
+    description: Opus hace toda la tarea solo.
+    roles:
+      - {role: solo, model: opus, effort: high}
+    single_track: true          # sin delegación, SDK y CC serían la misma ejecución
+    cc: {subagents_enabled: false}
+
+  B2:
+    name: Referencia media
+    description: Sonnet hace toda la tarea solo.
+    roles:
+      - {role: solo, model: sonnet, effort: high}
+    single_track: true          # sin delegación, SDK y CC serían la misma ejecución
+    cc: {subagents_enabled: false}
+
+  A1:
+    name: Planifica y ejecuta
+    description: Opus escribe un plan; Sonnet lo implementa leyendo solo los archivos del plan.
+    roles:
+      - {role: planner, model: opus, effort: high}
+      - {role: coder, model: sonnet, effort: medium}
+    cc: {subagents_enabled: true, subagents: [coder]}
+
+  A2:
+    name: Trabajo en paralelo
+    description: Opus divide; Sonnet hace la lógica y, en paralelo, Haiku tests/tipos/relleno.
+    roles:
+      - {role: planner, model: opus, effort: high}
+      - {role: coder, model: sonnet, effort: medium}
+      - {role: test_writer, model: haiku, effort: low}
+    parallel: true
+    cc: {subagents_enabled: true, subagents: [coder, test_writer]}
+
+  A3:
+    name: Explorar barato
+    description: Haiku explora y resume; Opus planifica con el resumen; Sonnet edita.
+    roles:
+      - {role: explorer, model: haiku, effort: low}
+      - {role: planner, model: opus, effort: high}
+      - {role: coder, model: sonnet, effort: medium}
+    # En CC se usa un subagente propio "explorer" con modelo fijado a Haiku,
+    # no el subagente Explore integrado (cuyo modelo decide Claude Code).
+    cc: {subagents_enabled: true, subagents: [explorer, coder]}
+
+  A4:
+    name: Escalar si falla
+    description: Sonnet intenta; si sus propias comprobaciones fallan, Opus recibe el error y corrige.
+    roles:
+      - {role: solo, model: sonnet, effort: medium}
+      - {role: escalation, model: opus, effort: high}
+    escalation:
+      max_escalations: 1
+      # El disparador NUNCA son los tests ocultos de SWE-bench (sería filtrar la respuesta).
+      trigger: agent_visible_checks_failed
+    cc: {subagents_enabled: true, subagents: [escalation]}
+
+# Límites comunes a todas las variantes (iguales en los dos tracks).
+limits:
+  max_turns_orchestrator: 100      # pasos de herramienta del modelo principal / solo
+  max_turns_subagent: 50           # pasos por invocación de subagente
+  wall_clock_timeout_s: 3600
+  max_tokens_per_response: 64000   # con streaming

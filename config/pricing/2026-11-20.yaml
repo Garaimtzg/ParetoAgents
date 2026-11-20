@@ -1,0 +1,46 @@
+# Tarifas de la API de Claude (USD por millón de tokens).
+# Fuente: https://platform.claude.com/docs/en/about-claude/pricing
+# Consultada: 2026-11-20. No editar este archivo: si los precios cambian,
+# crear uno nuevo con la fecha de consulta y apuntar a él en config/experiment.yaml.
+retrieved: "2026-11-20"
+source: "https://platform.claude.com/docs/en/about-claude/pricing"
+currency: USD
+unit: per_mtok
+
+models:
+  claude-opus-5-5:
+    tiers:
+      - max_prompt_tokens: null          # sin límite: 1M de contexto a precio estándar
+        input: 4.00
+        cache_write_5m: 5.00
+        cache_write_1h: 8.00
+        cache_read: 0.20                 # 0,05x la entrada (nota 2 de la web)
+        output: 20.00
+  claude-sonnet-5-5:
+    tiers:
+      - max_prompt_tokens: null
+        input: 2.00
+        cache_write_5m: 2.50
+        cache_write_1h: 4.00
+        cache_read: 0.10                 # CONFIRMADO 0,10 (no 0,20) — nota 2 de la web
+        output: 10.00
+  claude-haiku-5-5:
+    # El "prompt" cuenta TODA la entrada: input + lecturas de caché + escrituras de caché.
+    # Si supera 100.000 tokens, la petición entera (salida incluida) va a la tarifa cara.
+    tiers:
+      - max_prompt_tokens: 100000
+        input: 0.10
+        cache_write_5m: 0.125
+        cache_write_1h: 0.20
+        cache_read: 0.01
+        output: 0.50
+      - max_prompt_tokens: null
+        input: 0.50
+        cache_write_5m: 0.625            # CONFIRMADO (antes "por confirmar")
+        cache_write_1h: 1.00             # CONFIRMADO (antes "por confirmar")
+        cache_read: 0.05
+        output: 2.50
+
+notes:
+  - "inference_geo=us multiplica todo por 1,1x: NO se usa en el experimento."
+  - "Fast mode y Batch API NO se usan en el experimento."
