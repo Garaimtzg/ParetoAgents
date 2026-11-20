@@ -1,0 +1,39 @@
+# Parámetros del experimento congelados en la Fase 0 (ver docs/preregistro.md §4–§7).
+pricing_file: config/pricing/2026-11-20.yaml
+variants_file: config/variants.yaml
+
+dataset:
+  source: princeton-nlp/SWE-bench_Verified
+  tasks_per_level: 25
+  levels: [1, 2, 3]
+  pilot_tasks: 5                    # Fases 2 y 4; no entran en las 75 del análisis
+
+repetitions:
+  main_round: 1                     # 12 variantes × 75 tareas = 900 ejecuciones
+  extra_repetitions: 2              # → 3 ejecuciones en total por tarea del subconjunto
+  subset_tasks_per_level: 5         # subconjunto estratificado: 15 tareas
+  subset_seed: 20261120
+
+execution:
+  order: random
+  order_seed: 20261120
+  max_concurrency: 4
+  min_gap_same_task_s: 600          # separar ejecuciones de la misma tarea > 5 min (TTL de caché)
+  cache_ttl: 5m                     # el Track SDK usa caché de 5 min, como Claude Code
+  infra_retries: 2                  # solo fallos de infraestructura, nunca del modelo
+
+budget_usd:
+  campaign_cap: 4000                # tope total (pilotos + ronda principal + repeticiones)
+  per_run_cap: 10                   # se corta la ejecución y cuenta como NO resuelta
+  phase2_pilot_cap: 150
+  alert_at_fraction_of_estimate: 1.25
+
+analysis:
+  alpha: 0.05
+  noninferiority_margin_pp: 10      # prueba formal, Pass@1 global (n=75)
+  descriptive_margin_pp: 5          # criterio descriptivo por nivel (H1)
+  bootstrap_resamples: 10000
+  bootstrap_seed: 20261120
+  multiple_comparisons: holm
+  valid_runs_min_fraction: 0.98
+  billing_reconciliation_max_error: 0.01
