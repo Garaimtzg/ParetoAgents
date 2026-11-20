@@ -1,4 +1,5 @@
-# Las 6 topologías × 2 tracks = 12 variantes congeladas en la Fase 0 (ver docs/preregistro.md).
+# 6 topologías → 10 variantes (D-013): B1 y B2 son una sola variante ("solo");
+# A1–A4 existen en los dos tracks (SDK y CC). Ver docs/decisiones.md.
 # Cambiar algo aquí después del preregistro exige una entrada nueva en docs/decisiones.md.
 #
 # effort: low | medium | high | xhigh | max (output_config.effort en la API).
@@ -18,6 +19,7 @@ topologies:
     description: Opus hace toda la tarea solo.
     roles:
       - {role: solo, model: opus, effort: high}
+    single_track: true          # sin delegación, SDK y CC serían la misma ejecución
     cc: {subagents_enabled: false}
 
   B2:
@@ -25,6 +27,7 @@ topologies:
     description: Sonnet hace toda la tarea solo.
     roles:
       - {role: solo, model: sonnet, effort: high}
+    single_track: true          # sin delegación, SDK y CC serían la misma ejecución
     cc: {subagents_enabled: false}
 
   A1:

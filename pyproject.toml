@@ -9,7 +9,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
-# Fases posteriores: anthropic (Track SDK), pandas/matplotlib/scipy (Fase 6).
+swebench = ["swebench>=4.1", "datasets>=2"]   # cargar tareas y evaluar (Docker)
+# Fase 6: pandas/matplotlib/scipy.
 
 [build-system]
 requires = ["setuptools>=68"]

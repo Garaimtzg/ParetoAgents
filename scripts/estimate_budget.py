@@ -1,5 +1,8 @@
 """Estimación A PRIORI del coste de la campaña (Fase 0).
 
+Con la suscripción (D-012) no se paga en dólares: es el coste EQUIVALENTE en API,
+útil para comparar variantes y para prever cuánto límite de uso hará falta.
+
 Los perfiles de tokens son supuestos razonados, no medidas: la Fase 2 los
 sustituye por los del piloto de 5 tareas. Sirve para fijar el tope de gasto
 del preregistro y para tener una referencia contra la que comparar el piloto.
@@ -37,7 +40,7 @@ PROFILES = {
     ("A4", "escalation"): (8, 70 * K, 0.30, 50 * K, 1.5 * K),  # solo en ~40 % de tareas
 }
 ESCALATION_RATE = 0.40
-CC_OVERHEAD = 1.30  # Claude Code añade su system prompt, herramientas y delegación
+CC_OVERHEAD = 1.30  # todo pasa por Claude Code (D-013): su system prompt y herramientas
 
 
 def run_cost(prices: PriceTable, variant) -> float:
@@ -56,7 +59,7 @@ def run_cost(prices: PriceTable, variant) -> float:
         if role.role == "escalation":
             cost *= ESCALATION_RATE
         total += cost
-    return total * (CC_OVERHEAD if variant.track == "cc" else 1.0)
+    return total * CC_OVERHEAD
 
 
 def main() -> None:
@@ -73,10 +76,10 @@ def main() -> None:
     pilot_runs = 3 * exp["dataset"]["pilot_tasks"] + len(variants) * exp["dataset"]["pilot_tasks"]
 
     runs = {
-        "Piloto Fase 2 (B1-SDK, B1-CC, A1-CC × 5)": 3 * exp["dataset"]["pilot_tasks"],
-        "Humo Fase 4 (12 variantes × 5)": len(variants) * exp["dataset"]["pilot_tasks"],
-        "Ronda principal (12 × 75)": len(variants) * n_tasks * rep["main_round"],
-        "Repeticiones (12 × 15 × 2)": len(variants) * n_subset * rep["extra_repetitions"],
+        "Piloto Fase 2 (B1, A1-SDK, A1-CC × 5)": 3 * exp["dataset"]["pilot_tasks"],
+        "Humo Fase 4 (10 variantes × 5)": len(variants) * exp["dataset"]["pilot_tasks"],
+        "Ronda principal (10 × 75)": len(variants) * n_tasks * rep["main_round"],
+        "Repeticiones (10 × 15 × 2)": len(variants) * n_subset * rep["extra_repetitions"],
     }
     assert sum(list(runs.values())[:2]) == pilot_runs
 

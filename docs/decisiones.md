@@ -16,7 +16,11 @@ La Fase 0 termina cuando D-001 a D-009 pasan a `aceptada`. **Aceptadas el 2026-1
 | D-008 | 2026-11-20 | Límites comunes: 100 pasos para el principal, 50 por subagente, 60 min y `max_tokens` 64K con streaming. | aceptada | No |
 | D-009 | 2026-11-20 | Regla de nivel basada en archivos y líneas del parche oficial (preregistro §2), ajustable una sola vez en la Fase 3. | aceptada | No |
 | D-010 | 2026-11-20 | Precios confirmados en la web de Anthropic: la lectura de caché de Sonnet 5.5 cuesta **0,10 USD** (no 0,20); Haiku 5.5 > 100K cobra 0,625 USD (escritura 5 min) y 1,00 USD (escritura 1 h). | aceptada | No |
-| D-011 | 2026-11-20 | Todas las ejecuciones (los dos tracks) se pagan con una **API key** de un workspace propio de la Console, nunca con la suscripción de Claude. | aceptada | No |
+| D-011 | 2026-11-20 | Todas las ejecuciones (los dos tracks) se pagan con una **API key** de un workspace propio de la Console, nunca con la suscripción de Claude. | sustituida por D-012 | No |
+| D-012 | 2026-11-20 | **Sin gastar dinero:** todas las ejecuciones usan la **suscripción de Claude** a través de `claude -p`. El coste se mide en USD **equivalentes** de API. Sustituye a D-011; el presupuesto de D-005 pasa a ser equivalente. | aceptada | No |
+| D-013 | 2026-11-20 | El Track SDK pasa a ser un **script Python que encadena llamadas `claude -p`** (una por rol, con modelo y esfuerzo fijos y sin subagentes). B1 y B2 quedan como una sola variante cada una → **10 variantes**. Sustituye a D-001. | aceptada | No |
+| D-014 | 2026-11-20 | La escala de la campaña (tareas y repeticiones) se fija tras el piloto de la Fase 2, según el límite de uso que consuma cada ejecución. Orden de recorte: repeticiones → tareas por nivel (mínimo 15). | aceptada | No |
+| D-015 | 2026-11-20 | Fase 1 (provisional): el agente lee y edita pero **no ejecuta código** (no hay contenedor por ejecución). Se revisa en la Fase 4, porque A4 necesita ejecutar tests. | aceptada | No |
 
 ## Motivos
 
@@ -36,8 +40,21 @@ La Fase 0 termina cuando D-001 a D-009 pasan a `aceptada`. **Aceptadas el 2026-1
 
 **D-011 — API key.** (1) La puerta de la Fase 2 exige cuadrar el coste con la factura, y la suscripción no factura por token. (2) Los límites de uso de la suscripción cortarían la campaña a medias. (3) Los dos tracks se pagan igual. Se usa un workspace propio de la Console con un límite de gasto de 4.000 USD, así la factura solo contiene el experimento. El runner se niega a arrancar sin `ANTHROPIC_API_KEY`, y la Fase 1 comprueba que `claude -p` cobra a esa clave y no a la sesión de la suscripción.
 
+**D-012 — Suscripción.** Decisión del responsable: no gastar dinero, solo límite de uso. Consecuencias: (1) no hay factura por token, así que la puerta de la Fase 2 pasa a ser cuadrar nuestro cálculo con los totales por modelo (`modelUsage`) y con el `total_cost_usd` de Claude Code; (2) los límites de uso marcan el ritmo y quizá el tamaño de la campaña (D-014); (3) el código fuerza la suscripción: quita `ANTHROPIC_API_KEY` y `ANTHROPIC_AUTH_TOKEN` del entorno y aborta si Claude Code informa de `apiKeySource` distinto de `none`.
+
+**D-013 — Track SDK con `claude -p`.** La API directa solo funciona con API key. La pregunta de la RQ2 se mantiene: reparto fijo programado por nosotros frente a reparto decidido por Claude Code. Ahora las dos opciones usan el mismo harness, así que el "impuesto de autonomía" mide solo la delegación y no las diferencias entre la API y Claude Code. Además, coincide con las "10 variantes" de la propuesta original.
+
+**D-015 — Sin ejecución de código.** Lo más simple que funciona sin Docker por ejecución. Baja el Pass@1 de todas las variantes por igual y no afecta a la comparación de costes.
+
 ## Pendiente de verificar en fases posteriores (no bloquea la Fase 0)
 
 - **Fase 1:** versión exacta de Claude Code que se congela, y cómo se desactivan los subagentes en B1/B2-CC (bloquear la herramienta de subagentes con `--disallowedTools`).
 - **Fase 2:** si Claude Code permite fijar el esfuerzo por subagente. Si no, se documenta como asimetría entre tracks (riesgo ya listado en la definición).
-- **Fase 2:** la cifra de 0,10 USD se contrasta además con la factura del piloto.
+- **Fase 2:** comprobar que el tramo > 100K de Haiku aparece igual en nuestro cálculo y en `costUSD` de Claude Code.
+
+## Comprobado el 2026-11-20 (Claude Code 2.1.329)
+
+- `claude -p --output-format stream-json --verbose` con OAuth informa de `apiKeySource: "none"`.
+- Los registros de sesión en disco (`~/.claude/projects/*/<sesión>.jsonl` y `<sesión>/subagents/agent-*.jsonl` + `.meta.json`) dan la salida final de cada llamada y el rol de cada subagente. Cuadran exactamente con `modelUsage`. La salida stream-json **no** basta, porque en los subagentes solo trae el recuento inicial de salida.
+- El hilo principal escribe en caché de 1 h y los subagentes en caché de 5 min.
+- `--effort`, `--max-turns` y `--max-budget-usd` existen. `--bare` obliga a usar API key: no se usa.

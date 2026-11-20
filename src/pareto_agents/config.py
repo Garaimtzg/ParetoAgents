@@ -45,10 +45,11 @@ def load_variants(path: str | Path = "config/variants.yaml") -> list[Variant]:
             if r["effort"] not in EFFORTS:
                 raise ValueError(f"{topo_id}/{r['role']}: effort inválido {r['effort']!r}")
             roles.append(Role(r["role"], aliases[r["model"]], r["effort"]))
-        for track in data["tracks"]:
+        tracks = ["solo"] if topo.get("single_track") else data["tracks"]
+        for track in tracks:
             variants.append(
                 Variant(
-                    id=f"{topo_id}-{track.upper()}",
+                    id=topo_id if track == "solo" else f"{topo_id}-{track.upper()}",
                     topology=topo_id,
                     track=track,
                     roles=tuple(roles),

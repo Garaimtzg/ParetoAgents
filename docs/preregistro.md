@@ -1,6 +1,8 @@
 # ParetoAgents — Preregistro de hipótesis y análisis
 
-**Versión:** 1.0 · **Fecha:** 2026-11-20 · **Estado:** congelado (`prereg-v1`)
+**Versión:** 1.1 · **Fecha:** 2026-11-20 · **Estado:** congelado (`prereg-v1`) + Enmienda 1
+
+> **Enmienda 1 (2026-11-20, antes de ver ningún dato).** Ver D-012 a D-015 en `decisiones.md`. (a) Todo se ejecuta con la suscripción de Claude: los costes son USD *equivalentes* de API, calculados igual que antes. (b) El Track SDK encadena llamadas `claude -p`; B1 y B2 son una sola variante cada una → **10 variantes**. En H1 y H2, las comparaciones "frente a B1 del mismo track" pasan a ser "frente a B1". (c) La puerta de la Fase 2 cuadra con los totales de Claude Code en vez de con una factura. (d) El número de tareas y repeticiones puede reducirse tras el piloto (D-014); si baja de 75, se recalcula el §8. Si el texto de abajo contradice esta enmienda, manda la enmienda.
 
 Este documento congela, **antes de ver ningún resultado**, qué se va a medir, cómo y con qué criterios se aceptan o rechazan las hipótesis. Complementa a [`definicion_proyecto.md`](definicion_proyecto.md). Los valores numéricos viven en [`config/experiment.yaml`](../config/experiment.yaml) y [`config/variants.yaml`](../config/variants.yaml); si este texto y la configuración no coinciden, manda la configuración y se corrige el texto.
 
